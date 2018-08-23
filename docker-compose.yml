@@ -1,0 +1,26 @@
+version: '3.4'
+services:
+  machinatrader:
+    container_name: machinatrader
+    image: machinatrader
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - ${MACHINATRADER_FILES_PATH:-./data}:/app/Data
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    expose:
+      - "27017"
+    ports:
+      - 27017:27017
+    volumes:
+      - ${MONGO_FILES_PATH:-./mongo}:/data/db

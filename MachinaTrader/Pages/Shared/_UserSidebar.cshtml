@@ -1,0 +1,13 @@
+@using AspNetCore.Identity.LiteDB.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="user-panel">
+    <div class="pull-left image">
+        <img src="/api/core/avatar" class="img-circle" alt="User Image">
+    </div>
+    <div class="pull-left info">
+        <p>@UserManager.GetUserName(User) &nbsp;<a href="/Account/Manage"><i class="fas fa-wrench"></i></a></p>
+        <span style="font-size: 10px;"><i id="signalrStatusSymbol" class="far fa-circle text-success"></i>&nbsp;&nbsp;<span id="signalrStatusText">Online</span></span>
+    </div>
+</div>

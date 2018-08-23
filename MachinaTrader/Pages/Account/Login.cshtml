@@ -1,0 +1,96 @@
+@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+<form method="post">
+    <div class="card-group">
+        <div class="card p-4">
+            <div class="card-body">
+                <h1><i class="machinacore-icon-logo" style="font-size: 30px;"></i>&nbsp;<b>Machina</b>Trader</h1>
+                <p class="text-muted">Sign In to your account</p>
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <i class="far fa-user"></i>
+                        </span>
+                    </div>
+                    <input asp-for="Input.Email" placeholder="Username/eMail" class="form-control" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="input-group mb-4">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <i class="far fa-lock"></i>
+                        </span>
+                    </div>
+                    <input asp-for="Input.Password" placeholder="Password" class="form-control" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <button type="submit" class="btn btn-primary px-4">Login</button>
+                    </div>
+                    <div class="col-8" style="text-align: right;">
+                        <span style="vertical-align: top;line-height: 25px;">Remember me?&nbsp;</span>
+                        <label class="switch switch-label switch-primary">
+                            <input asp-for="Input.RememberMe" class="switch-input bool" />
+                            <span class="switch-slider" data-checked="✓" data-unchecked="✕"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <a class="btn btn-link px-0" asp-page="./ForgotPassword">Forgot your password?</a>
+                    </div>
+                    <div class="col-6">
+                        <a class="btn btn-link px-0" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card text-white bg-primary py-5 d-md-down-none" style="width:44%">
+            <div class="card-body text-center">
+                <div>
+                    <h2>Sign up</h2>
+                    <p><br/>MachinaTrader is a members only website<br />If you register your account will need admin approval</p>
+                    <a class="btn btn-primary active mt-3" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register Now!</a>
+                </div>
+                <!--
+                <h4>Use another service to log in.</h4>
+                <hr />
+                @{
+                  if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                  {
+                    <div>
+                      <p>
+                        There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
+                        for details on setting up this ASP.NET application to support logging in via external services.
+                      </p>
+                    </div>
+                  }
+                  else
+                  {
+                    <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                      <div>
+                        <p>
+                          @foreach (var provider in Model.ExternalLogins)
+                          {
+                            <button type="submit" class="btn btn-default" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                          }
+                        </p>
+                      </div>
+                    </form>
+                  }
+                }
+                -->
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

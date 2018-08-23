@@ -1,0 +1,29 @@
+@{
+    Layout = "/Pages/_Layout.cshtml";
+}
+
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">
+            <i class="fal fa-user"></i>Change your account settings
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="row" style="margin: 0;">
+                <div class="col-3" style="background: #efefef;">
+                    <div style="margin: 15px;">
+                        <partial name="_ManageNav" />
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div style="margin: 15px;">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@RenderSection("Scripts", required: false)

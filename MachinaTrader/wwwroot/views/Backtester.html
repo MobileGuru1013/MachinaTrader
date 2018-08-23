@@ -1,0 +1,544 @@
+<!-- DATA TABLES -->
+<script src="/vendors/datatables.net/js/jquery.dataTables.js"></script>
+<script src="/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/vendors/datatables.net-bs4/js/dataTables.bootstrap4.js"></script>
+<link href="/vendors/datatables.net-bs4/css/dataTables.bootstrap4.css" rel="stylesheet" />
+<link href="/vendors/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" />
+<script src="/vendors/moment/js/moment-with-locales.min.js"></script>
+<script src="/vendors/axios/js/axios.min.js"></script>
+
+<style>
+    .greenCell {
+        background: rgba(0, 255, 0, 0.2) !important;
+    }
+
+    .redCell {
+        background: rgba(255, 0, 0, 0.20) !important;
+    }
+</style>
+<style>
+    .small-text {
+        font-size: 10px;
+        line-height: 24px;
+    }
+
+    .table-round > .box-body {
+        padding: 0;
+    }
+
+    .table th, .table td {
+        padding: 0.75rem;
+        vertical-align: top;
+        border-top: 0;
+    }
+
+    .table thead th {
+        vertical-align: bottom;
+        border-bottom: 0;
+    }
+
+    table.dataTable {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        border-collapse: collapse !important;
+    }
+
+    .dataTables_wrapper .row .col-sm-12 {
+        padding: 0 !important;
+    }
+
+    div.dataTables_wrapper div.dataTables_info {
+        padding: 1.8em;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate {
+        padding: 1em;
+    }
+
+    .card-body-header {
+        margin-right: 0;
+        margin-left: 0;
+        padding-top: 15px;
+        background-color: rgba(198, 198, 198, 0.5);
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .table-bordered {
+        border: 0;
+    }
+
+    .select2-selection {
+        width: 100%;
+    }
+</style>
+
+<div class="row animated fadeIn" id="widgetBackendTester">
+
+    <div class="col-md-12">
+        <div class="card">
+
+            <div class="card-header">
+                <i class="fas fa-history"></i>&nbsp;Backtest
+            </div>
+
+            <div class="row card-body-header">
+                <div class="col-3">
+                    <select id="tradingStrategy" name="tradingStrategy" class="selectpicker">
+                        <option value="all" data-icon="fas fa-star">&nbsp;&nbsp;Test all Strategies</option>
+                        <option v-for="(value, key) in allStrategiesData" v-bind:value="toBase64(allStrategiesData[key]['Name'])" data-icon="fas fa-chart-line">&nbsp;&nbsp;{{allStrategiesData[key]['Name']}}</option>
+                    </select>
+                </div>
+                <div class="col-1">
+                    <button type="button" class="btn btn-success" style="width: 100%;" id="startButton" onclick="runStrategy();">Start</button>
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-warning" style="width: 100%;" id="refreshButton" onclick="refeshCandles();">Refresh Candles</button>
+                </div>
+                <div class="col-6">
+
+                    <div class="form-group row">
+                        <label for="candleAge" class="col-3 col-form-label">Candles Size:</label>
+                        <div class='col-9 input-group date' id='candleAge'>
+                            <select name="display" id="candleSize" class="selectpicker" data-width="auto">
+                                <option value="1" data-icon="fas fa-clock">&nbsp;&nbsp;1 minute</option>
+                                <option value="5" data-icon="fas fa-clock">&nbsp;&nbsp;5 minutes</option>
+                                <option value="15" data-icon="fas fa-clock">&nbsp;&nbsp;15 minutes</option>
+                                <option value="30" data-icon="fas fa-clock">&nbsp;&nbsp;30 minutes</option>
+                                <option value="60" data-icon="fas fa-clock">&nbsp;&nbsp;1 hour</option>
+                                <option value="120" data-icon="fas fa-clock">&nbsp;&nbsp;2 hours</option>
+                                <option value="240" data-icon="fas fa-clock">&nbsp;&nbsp;4 hours</option>
+                                <option value="1440" data-icon="fas fa-clock">&nbsp;&nbsp;1 day</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row card-body-header">
+                <div class="col-6">
+                    <div class="form-group row">
+                        <label for="exchangeCoinsId" class="col-3 col-form-label">Coin:</label>
+                        <div class='col-9 input-group date' id='exchangeCoinsId'>
+                            <select name="display" id="currencyToCheck" class="select2-multiple" data-live-search="true" data-size="10" data-width="auto">
+                                <option v-for="(value, key) in exchangeCoinsData" v-bind:value="value" data-icon="fas fa-chart-line">&nbsp;&nbsp;{{value}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="form-group row">
+                        <label for="exchangeBaseCurrencyId" class="col-4 col-form-label">Currency:</label>
+                        <div class='col-8 input-group date' id='exchangeBaseCurrencyId'>
+                            <select name="display" id="baseCurrencyToCheck" class="selectpicker">
+                                <option v-for="(value, key) in exchangeBaseCurrenciesData" v-bind:value="value" data-icon="fas fa-chart-line">&nbsp;&nbsp;{{value}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="form-group row">
+                        <label for="exchangeExchangeId" class="col-4 col-form-label">Exchange:</label>
+                        <div class='col-8 input-group date' id='exchangeExchangeId'>
+                            <select name="display" id="exchangeSelect" class="selectpicker">
+                                <option value="binance" data-image="/img/exchange/binance.png">Binance</option>
+                                <option value="gdax" data-image="/img/exchange/gdax.png">Gdax</option>
+                                <option value="bittrex" data-image="/img/exchange/bittrex.png">Bittrex</option>
+                                <option value="poloniex" data-image="/img/exchange/poloniex.png">Poloniex</option>
+                                <option value="kucoin" data-image="/img/exchange/kucoin.png">KuCoin</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row card-body-header">
+                <div class="col-6">
+                    <template v-if="candleAgeData.length !== 0">
+                        <div class="form-group row">
+                            <label for="exchangeCoinsAvailableData" class="col-3 col-form-label">Available Data:</label>
+                            <div class='col-9 col-form-label' id='exchangeCoinsAvailableData'>
+                                <template v-for="(value, key) in candleAgeData">
+                                    {{candleAgeData[key]["Coin"]}}: {{formatDate(candleAgeData[key]["FirstCandleDate"])}} to {{formatDate(candleAgeData[key]["LastCandleDate"])}}
+                                    <br />
+                                </template>
+
+                            </div>
+                        </div>
+                    </template>
+
+                    <template v-if="candleAgeData.length === 0">
+                        <div class="form-group row">
+                            <label for="exchangeCoinsNoAvailableData" class="col-3 col-form-label">Available Data:</label>
+                            <div class='col-9 col-form-label' id='exchangeCoinsNoAvailableData'>
+                                No available Data please refresh first or select other coin
+                            </div>
+                        </div>
+                    </template>
+
+                </div>
+            </div>
+
+            <div class="card-body" id="backtesterBody">
+                <table class="table table-striped p-0 table-hover" id="backtesterTableId"></table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="tradingViewModal">
+    <div class="modal-dialog" style="width:80%">
+        <div id="tradingViewModalContent" class="modal-content">
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="signalsModal">
+    <div class="modal-dialog" style="max-width: 95% !important">
+        <div id="signalsModalContent" class="modal-content">
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+
+    var table = null;
+    var initDatatable;
+    var dataArray = new Array();
+    var backtestData = null;
+
+    function selectPickerImage(opt) {
+        if (!opt.id) {
+            return opt.text;
+        }
+        var optimage = $(opt.element).data('image');
+        var opticon = $(opt.element).data('icon');
+        if (!optimage && !opticon) {
+            return opt.text;
+        }
+        if (optimage) {
+            var $opt = $(
+                '<span class="userName"><img style="width: 16px;" src="' + optimage + '" class="dropdownImage" />&nbsp;&nbsp;' + $(opt.element).text() + '</span>'
+            );
+            return $opt;
+        }
+        if (opticon) {
+            var $opt = $(
+                '<span class="userName"><i class="' + opticon + '"/></i>&nbsp;&nbsp;' + $(opt.element).text() + '</span>'
+            );
+            return $opt;
+        }
+    };
+
+    var pagefunction = function () {
+
+        $(".selectpicker").select2({
+            theme: "bootstrap",
+            templateResult: selectPickerImage,
+            templateSelection: selectPickerImage,
+            width: "100%"
+        });
+
+        $('.select2-multiple').select2({
+            multiple: true,
+            theme: "bootstrap",
+            templateResult: selectPickerImage,
+            templateSelection: selectPickerImage,
+            width: "100%"
+        })
+
+        $('#exchangeSelect').change(function () {
+            widgetBackendTester.updateSymbols();
+        });
+
+        $('#baseCurrencyToCheck').change(function () {
+            widgetBackendTester.updateSymbolsByCurrency();
+            widgetBackendTester.updateCandleAge();
+        });              
+
+        $('#currencyToCheck').change(function () {
+            widgetBackendTester.updateCandleAge();
+        });
+
+        $('#candleSize').change(function () {
+            widgetBackendTester.updateCandleAge();
+        });
+    };
+
+    function loadSignalsViewModal(url, exchangeVal, marketVal, candleSizeVal, tradingStrategyVal) {
+        exchange = exchangeVal;
+        market = marketVal;
+        candleSize = candleSizeVal;
+        tradingStrategy = tradingStrategyVal;
+        $.get(url, function (data) {
+            $('#signalsModalContent').html(data);
+            $('#signalsModal').modal('show');
+        });
+    }
+
+    var refeshCandles = function () {
+        $("#refreshButton").prop("disabled", true);
+        $("#startButton").prop("disabled", true);
+
+        axios.get('/api/backtester/refreshCandles?exchange=' + $("#exchangeSelect").val() + '&coinsToBuy=' + $("#currencyToCheck").val() + '&candleSize=' + $("#candleSize").val() + '&baseCurrency=' + $("#baseCurrencyToCheck").val()).then((response) => {
+            $("#refreshButton").prop("disabled", false);
+            $("#startButton").prop("disabled", false);
+            widgetBackendTester.updateCandleAge();
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    };
+
+    var runStrategy = function () {
+        if (table != null) {
+            table.clear().draw();
+            dataArray = new Array();
+        }
+
+        axios.get('/api/backtester/backtesterResults?exchange=' + $("#exchangeSelect").val() + '&coinsToBuy=' + $("#currencyToCheck").val() + '&candleSize=' + $("#candleSize").val() + '&strategy=' + $("#tradingStrategy").val() + '&baseCurrency=' + $("#baseCurrencyToCheck").val()).then((response) => {
+        }).catch((error) => {
+            console.log(error);
+        });
+
+        initDatatable = function () {
+            table = $('#backtesterTableId').DataTable({
+                aaData: backtestData,
+                responsive: true,
+                "autoWidth": false,
+                "iDisplayLength": 100,
+                'columnDefs': [{
+                    'targets': 0,
+                    'searchable': true,
+                    'orderable': true,
+                    'className': 'dt-body-center'
+                }],
+                'order': [0, 'asc'],
+                "createdRow": function (row, data, dataIndex) {
+                    /*if (data.market == true) {
+                        $(row).addClass('yellowCell');
+                    }*/
+                },
+                "columns": [
+                    {
+                        "title": "Strategy",
+                        "mDataProp": "Strategy",
+                        responsivePriority: 0,
+                    },
+                    {
+                        "title": "Market",
+                        "mDataProp": "Market",
+                        "bVisible": true
+                    },
+                    {
+                        "title": "Signals",
+                        "mDataProp": "Signals",
+                        "sWidth": "60px",
+                        "sType": "alt-string",
+                        "sClass": "center",
+                        responsivePriority: 2,
+                        mRender: function (data, type, full, meta) {
+                            var formatted = '<a href="javascript:void(0)" class="btn btn-primary btn-sm" onclick="loadSignalsViewModal(\'/views/SignalsWidget.html\', \'' + $("#exchangeSelect").val() + '\', \'' + full.Market + '\', \'' + $("#candleSize").val() + '\', \'' + full.Strategy + '\' )">signals</a>';
+                            return formatted;
+                        }
+                    },
+                    {
+                        "title": "AmountOfTrades",
+                        "mDataProp": "AmountOfTrades",
+                        "sWidth": "120px",
+                        "sType": "alt-string",
+                        "sClass": "center",
+                        responsivePriority: 2,
+                        mRender: function (data, type, full, meta) {
+                            var formatted = full.AmountOfTrades + " <span style='color: #008000'>(" + full.AmountOfProfitableTrades + "</span>/<span  style='color: #ff0000'>" + (full.AmountOfTrades - full.AmountOfProfitableTrades) + "</span>)";
+                            return formatted;
+                        }
+                    },
+                    {
+                        "title": "SuccessRate",
+                        "mDataProp": "SuccessRate",
+                        "sWidth": "120px",
+                        "sType": "alt-string",
+                        "sClass": "center",
+                        responsivePriority: 2,
+                        mRender: function (data, type, row) {
+                            var formatted = (row.SuccessRate).toFixed(2) + " %";
+                            return formatted;
+                        }
+                    },
+                    {
+                        "title": "TotalProfit",
+                        "mDataProp": "TotalProfit",
+                        "sWidth": "120px",
+                        "sType": "alt-string",
+                        "sClass": "center",
+                        responsivePriority: 2,
+                        mRender: function (data, type, row) {
+                            var formatted = (row.TotalProfit).toFixed(3) + " BTC";
+                            return formatted;
+                        },
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            if (rowData.TotalProfit > 0) $(td).addClass('greenCell');
+                            if (rowData.TotalProfit < 0) $(td).addClass('redCell');
+                        }
+                    },
+                    {
+                        "title": "TotalProfitPercentage",
+                        "mDataProp": "TotalProfitPercentage",
+                        "sWidth": "120px",
+                        "sType": "alt-string",
+                        "sClass": "center",
+                        responsivePriority: 2,
+                        mRender: function (data, type, row) {
+                            var formatted = (row.TotalProfitPercentage).toFixed(2) + " %";
+                            return formatted;
+                        },
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            if (rowData.TotalProfit > 0) $(td).addClass('greenCell');
+                            if (rowData.TotalProfit < 0) $(td).addClass('redCell');
+                        }
+                    },
+                    {
+                        "title": "AverageDuration",
+                        "mDataProp": "AverageDuration",
+                        "sWidth": "120px",
+                        "sType": "alt-string",
+                        "sClass": "center",
+                        responsivePriority: 2,
+                        mRender: function (data, type, row) {
+                            var formatted = (row.AverageDuration).toFixed(2) + " hours";
+                            return formatted;
+                        }
+                    },
+                    {
+                        "title": "DataPeriod",
+                        "mDataProp": "DataPeriod",
+                        "sWidth": "120px",
+                        "sType": "alt-string",
+                        "sClass": "center",
+                        responsivePriority: 2,
+                        mRender: function (data, type, row) {
+                            var formatted = row.DataPeriod + " days";
+                            return formatted;
+                        }
+                    }
+                ]
+            });
+        };
+    };
+
+    var widgetBackendTester = new Vue({
+        el: '#widgetBackendTester',
+        parent: vueMain,
+
+        data: {
+            allStrategiesData: null,
+            exchangeCoinsData: null,
+            exchangeBaseCurrenciesData: null,
+            candleAgeData: []
+        },
+
+        created: function () {
+            this.connectSignalr();
+            this.fetchData();
+        },
+
+        methods: {
+            connectSignalr: function () {
+                let hubRoute = "/signalr/HubBacktest";
+                let protocol = new signalR.JsonHubProtocol();
+                var options = {};
+
+                var connectionBacktester = new signalR.HubConnectionBuilder()
+                    //.configureLogging(signalR.LogLevel.Trace)
+                    .withUrl(hubRoute, options)
+                    .withHubProtocol(protocol)
+                    .build();
+
+                var connectSignalr = function () {
+                    connectionBacktester.start().then(function () {
+                        addSignalrClient(hubRoute, connectionBacktester);
+                    }).catch(function () {
+                    });
+                };
+
+                var reconnectSignalr = function () {
+                    if (signalrConnections[hubRoute] != null) {
+                        setTimeout(function () {
+                            console.log("reconnnect");
+                            connectSignalr();
+                        }, 5000);
+                    }
+                };
+
+                connectionBacktester.on('Send',
+                    function (msg) {
+                        if (backtestData == null) {
+                            dataArray.push(JSON.parse(msg));
+                            backtestData = dataArray;
+                            initDatatable();
+                        } else {
+                            dataArray.push(JSON.parse(msg));
+                            table.clear().rows.add(dataArray).draw();
+                        }
+                    });
+
+                connectionBacktester.onclose(function () {
+                    console.log("disconnected");
+                    reconnectSignalr();
+                });
+
+                connectSignalr();
+            },
+            fetchData: function () {
+                var self = this;
+                $.get('/api/backtester/backtesterStrategy', function (data) {
+                    self.allStrategiesData = data;
+                    self.$nextTick(function () {
+                        pagefunction();
+                        self.updateSymbols();
+                    });
+                });
+            },
+            formatDate: function (date) {
+                return moment(date).format('YYYY-MM-DD HH:mm');
+            },
+            toBase64: function (date) {
+                return btoa(date);
+            },
+            updateSymbols: function () {
+                var self = this;
+                $.get('/api/backtester/exchangePairs?exchange=' + $("#exchangeSelect").val(), function (data) {
+                    self.exchangeCoinsData = data[0];
+                    self.exchangeBaseCurrenciesData = data[1];
+                    self.$nextTick(function () {
+                        //pagefunction();
+                        //self.updateCandleAge();
+                    });
+                });
+            },
+            updateSymbolsByCurrency: function () {
+                var self = this;
+
+                $.get('/api/backtester/exchangePairs?exchange=' + $("#exchangeSelect").val() + '&baseCurrency=' + $("#baseCurrencyToCheck").val(), function (data) {
+                    self.exchangeCoinsData = data[0];               
+                });                                
+            },
+
+            updateCandleAge: function () {
+                var self = this;
+                $.get('/api/backtester/candlesAge?exchange=' + $("#exchangeSelect").val() + '&coinsToBuy=' + $("#currencyToCheck").val() + '&candleSize=' + $("#candleSize").val() + '&baseCurrency=' + $("#baseCurrencyToCheck").val(), function (data) {
+                    self.candleAgeData = data["result"];
+                    if (data["result"].length === 0) {
+                        $("#startButton").prop("disabled", true);
+                    } else {
+                        $("#startButton").prop("disabled", false);
+                    }
+                });
+            }
+        }
+    });
+
+</script>

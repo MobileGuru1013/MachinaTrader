@@ -1,0 +1,7 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+build_script:
+- cmd: C:\Python36-x64\python.exe BuildRelease.py
+artifacts:
+- path: BuildRelease/PortableApps/MachinaTrader_*.exe
+- path: MachinaTrader_*.7z

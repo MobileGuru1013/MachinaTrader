@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="Crypto trading bot">
+    <meta name="author" content="MachinaTrader Team">
+    <meta name="keyword" content="Crypto, Cryptotrading, tradingbot">
+    <title>MachinaTrader</title>
+    <!-- Icons-->
+    <link href="/css/fortawesome/css/fontawesome.css" rel="stylesheet" asp-append-version="true">
+    <link href="/css/fortawesome/css/fa-regular.css" rel="stylesheet" asp-append-version="true">
+    <link href="/css/fortawesome/css/fa-solid.css" rel="stylesheet" asp-append-version="true">
+    <link href="/css/fortawesome/css/fa-light.css" rel="stylesheet" asp-append-version="true">
+    <link href="/css/fortawesome/css/fa-brands.css" rel="stylesheet" asp-append-version="true">
+    <!-- Main styles for this application-->
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/machinacore-font/style.css" rel="stylesheet">
+</head>
+<body class="app flex-row align-items-center">
+    <partial name="_CookieConsentPartial" />
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap and necessary plugins-->
+    <script src="/vendors/jquery/js/jquery.min.js"></script>
+    <script src="/vendors/popper.js/js/popper.min.js"></script>
+    <script src="/vendors/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/vendors/perfect-scrollbar/js/perfect-scrollbar.min.js"></script>
+    <script src="/vendors/@@machinacore/machinacoreui/js/coreui.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

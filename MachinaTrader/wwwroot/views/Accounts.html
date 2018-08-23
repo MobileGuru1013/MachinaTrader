@@ -1,0 +1,273 @@
+<!-- DATA TABLES -->
+<script src="/vendors/datatables.net/js/jquery.dataTables.js"></script>
+<script src="/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/vendors/datatables.net-bs4/js/dataTables.bootstrap4.js"></script>
+<link href="/vendors/datatables.net-bs4/css/dataTables.bootstrap4.css" rel="stylesheet" />
+<link href="/vendors/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" />
+<script src="/vendors/moment/js/moment-with-locales.min.js"></script>
+<script src="/vendors/axios/js/axios.min.js"></script>
+<script src="/vendors/bootbox/js/bootbox.min.js"></script>
+
+
+<style>
+    .greenCell {
+        background: rgba(0, 255, 0, 0.2) !important;
+    }
+
+    .orangeCell {
+        background: rgba(0, 255, 152, 0.1) !important;
+    }
+
+    .redCell {
+        background: rgba(255, 0, 0, 0.20) !important;
+    }
+
+    .small-text {
+        font-size: 10px;
+        line-height: 24px;
+    }
+
+    .table-round > .box-body {
+        padding: 0;
+    }
+
+    .table th, .table td {
+        padding: 0.75rem;
+        vertical-align: top;
+        border-top: 0;
+    }
+
+    .table thead th {
+        vertical-align: bottom;
+        border-bottom: 0;
+    }
+
+    table.dataTable {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        border-collapse: collapse !important;
+    }
+
+    .dataTables_wrapper .row .col-sm-12 {
+        padding: 0 !important;
+    }
+
+    div.dataTables_wrapper div.dataTables_info {
+        padding: 1.8em;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate {
+        padding: 1em;
+    }
+
+    .card-body-header {
+        margin-right: 0;
+        margin-left: 0;
+        padding-top: 15px;
+        background-color: rgba(198, 198, 198, 0.5);
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .table-bordered {
+        border: 0;
+    }
+
+    .select2-selection {
+        width: 100%;
+    }
+
+    .dataTables_length {
+        margin-left: 20px;
+    }
+
+    .dataTables_filter {
+        margin-right: 20px;
+    }
+</style>
+
+<div class="animated fadeIn" id="accounts">
+    <div class="row" id="widgetAccounts">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-history"></i>&nbsp;Exchange Account
+                </div>
+                <div class="card-body" id="accountsTable">
+                    <table class="table table-striped p-0 table-hover" id="accountsTableId"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var pagefunction = function () {
+    };
+    
+    $(document).ready(function () {
+        table = $('#accountsTableId').DataTable({
+            ajax: {
+                url: '/api/account/balance',
+                dataSrc: ''
+            },
+            "oLanguage": {
+                "sEmptyTable": "Check your API keys under configuration page."
+            },
+            responsive: true,
+            "autoWidth": false,
+            "iDisplayLength": 100,
+            'columnDefs': [{
+                'targets': 0,
+                'searchable': true,
+                'orderable': true,
+                'className': 'dt-body-center'
+            }],
+            'order': [0, 'desc'],
+            "columns": [
+                {
+                    "title": "Market",
+                    "mDataProp": "market",
+                    "sWidth": "200px",
+                    "sType": "alt-string",
+                    "sClass": "center",
+                    responsivePriority: 1,
+                    mRender: function (data, type, full, meta) {
+                        var formatted = full.market;
+                        formatted = '<span class="btn btn-success btn-sm" style="width: 50px;">' + formatted + '</span>&nbsp;';
+                        return formatted;
+                    }
+                },
+                {
+                    "title": "Total Coins",
+                    "sWidth": "150px",
+                    "sType": "alt-string",
+                    "sClass": "center",
+                    responsivePriority: 2,
+                    mRender: function (data, type, full, meta) {
+                        var formatted = parseFloat(full.totalCoins).toFixed(8);
+                        return formatted;
+                    }
+                },
+                {
+                    "title": "Value in Usd",
+                    "sWidth": "1000px",
+                    "sType": "alt-string",
+                    "sClass": "center",
+                    responsivePriority: 2,
+                    mRender: function (data, type, full, meta) {
+                        var formatted = parseFloat(full.balanceInUsd).toFixed(3);
+                        formatted = '<span class="btn btn-info btn-sm" style="width: 50px;">USD</span>&nbsp;' + formatted;
+                        return formatted;
+                    }
+                },
+                {
+                    "title": "Value in DisplayCurrency",
+                    "sWidth": "1000px",
+                    "sType": "alt-string",
+                    "sClass": "center",
+                    responsivePriority: 2,
+                    mRender: function (data, type, full, meta) {
+                        if (full.balanceInDisplayCurrency === 0) {
+                            formatted = '<span class="btn btn-danger btn-sm" style="width: auto;">' + full.displayCurrency + ' not available</span>&nbsp;' ;
+                        }
+                        if (full.balanceInDisplayCurrency > 0) {
+                            var formatted = parseFloat(full.balanceInDisplayCurrency).toFixed(8);
+                            formatted = '<span class="btn btn-info btn-sm" style="width: 50px;">' + full.displayCurrency + '</span>&nbsp;' + formatted;
+                        }
+                        return formatted;
+                    }
+                }
+            ]
+        });
+    });
+
+
+    var accounts = new Vue({
+        el: '#accounts',
+        parent: vueMain,
+
+        data: {
+            accountsData: null
+        },
+
+        created: function () {
+            this.connectSignalr();
+            this.fetchData();
+        },
+
+        mounted: function () {
+        },
+
+        methods: {
+            connectSignalr: function () {
+                var self = this;
+                let hubRoute = "/signalr/HubAccounts";
+                let protocol = new signalR.JsonHubProtocol();
+                var options = {};
+
+                var connection = new signalR.HubConnectionBuilder()
+                    //.configureLogging(signalR.LogLevel.Trace)
+                    .withUrl(hubRoute, options)
+                    .withHubProtocol(protocol)
+                    .build();
+
+                var connectSignalr = function () {
+                    connection.start().then(function () {
+                        //Make sure to register this signalr client - Needed for disconnect on page change
+                        addSignalrClient(hubRoute, connection);
+                    }).catch(function (err) {
+                        console.log(err);
+                    });
+                };
+
+                var reconnectSignalr = function () {
+                    console.log(signalrConnections);
+                    if (signalrConnections[hubRoute] != null) {
+                        setTimeout(function () {
+                            console.log("reconnnect");
+                            connectSignalr();
+                        }, 5000);
+                    }
+                }
+
+                connection.on('Send', function (msg) {
+                    console.log("Msg from signalR: " + msg);
+
+                    table.ajax.url('/api/account/balance').load();
+                    //self.updateData();
+                });
+
+                connection.onclose(function (e) {
+                    if (e) {
+                        console.log('Connection closed with error: ' + e);
+                    }
+                    else {
+                        console.log('Disconnected');
+                    }
+                    //Reconnect -> This connection should never be offline
+                    reconnectSignalr();
+                });
+
+                connectSignalr();
+            },
+
+            fetchData: function () {
+                var self = this;
+                $.get("/api/account/balance", function (data) {
+                    self.myntLogsData = data;
+                    self.$nextTick(function () {
+                        pagefunction();
+                    });
+                });
+            },
+            updateData: function () {
+                $.get("/api/account/balance", function (data) {
+                    self.myntLogsData = data;
+                });
+            },
+            moment: function (data) {
+                return moment(data).format("YYYY-MM-DD HH:mm:ss");
+            },
+        }
+    });
+</script>

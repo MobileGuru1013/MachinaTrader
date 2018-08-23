@@ -1,0 +1,870 @@
+<script src="/js/jquery-cron.js"></script>
+
+
+
+<!-- qTip2 -->
+<link href="/vendors/qtip2/css/jquery.qtip.min.css" rel="stylesheet">
+<script src="/vendors/qtip2/js/jquery.qtip.min.js"></script>
+
+
+<style>
+    .cron-period > select {
+        display: inline;
+        width: initial;
+    }
+
+    .cron-block > select {
+        display: inline;
+        width: initial;
+    }
+</style>
+
+
+<div class="row animated fadeIn" id="apiMainConfig" v-if="apiMainConfigData && allStrategiesData && exchangeCoinsData">
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fab fa-btc"></i>System Configuration
+                <div class="card-actions">
+                    <a href="#" class="btn-minimize" data-widget="collapse"><i class="fas fa-angle-up"></i></a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped">
+                    <tr>
+                        <td width="300px">
+                            <span class="qTip" title="Web Port to use for MachinaTrader">Web Port <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                <strong>Default:</strong> 5000
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control integer" name="SystemOptions.WebPort" v-bind:value="apiMainConfigData['systemOptions']['webPort']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Database for MachinaTrader">Database <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                LiteDB have no dependencies (running database server)
+                                <br />MongoDB is faster but need a server
+                                <br /><br /><strong>Default:</strong> LiteDB
+                            </div>
+                        </td>
+                        <td>
+                            <select id="database" name="SystemOptions.Database" class="select2">
+                                <option :selected="apiMainConfigData['systemOptions']['database'] == 'MongoDB'" value="MongoDB" data-icon="fal fa-database">&nbsp;&nbsp;MongoDB</option>
+                                <option :selected="apiMainConfigData['systemOptions']['database'] == 'LiteDB'" value="LiteDB" data-icon="fal fa-database">&nbsp;&nbsp;LiteDB</option>
+                            </select>
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td width="300px">
+                            <span class="qTip" title="Theme for MachinaTrader">Theme <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                <strong>Default:</strong> light
+                            </div>
+                        </td>
+                        <td>
+                            <select id="theme" name="SystemOptions.Theme" class="select2">
+                                <option :selected="apiMainConfigData['systemOptions']['theme'] == 'light'" value="light" data-icon="fal fa-sun">&nbsp;&nbsp;Light</option>
+                                <option :selected="apiMainConfigData['systemOptions']['theme'] == 'dark'" value="dark" data-icon="fal fa-moon">&nbsp;&nbsp;Dark</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-12" id="databaseSettings">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-palette"></i>MongoDB Options
+                <div class="card-actions">
+                    <a href="#" class="btn-minimize" data-widget="collapse"><i class="fas fa-angle-up"></i></a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped">
+                    <tr>
+                        <td width="300px">
+                            <span class="qTip" title="Port">Url <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Host where your MongoDB is running.
+                                <br /><br /><strong>Default:</strong> <i>127.0.0.1</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control string" name="SystemOptions.MongoDbOptions.Host" v-bind:value="apiMainConfigData['systemOptions']['mongoDbOptions']['host']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Port">Port <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Port where your MongoDB is running.
+                                <br /><br /><strong>Default:</strong> <i>27017</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control integer" name="SystemOptions.MongoDbOptions.Port" v-bind:value="apiMainConfigData['systemOptions']['mongoDbOptions']['port']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Username">Username <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                If you are running localhost just let it empty.
+                                <br /><br /><strong>Default:</strong> <i>null</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control string" name="SystemOptions.MongoDbOptions.Username" v-bind:value="apiMainConfigData['systemOptions']['mongoDbOptions']['username']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Password">Password <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                If you are running localhost just let it empty.
+                                <br /><br /><strong>Default:</strong> <i>null</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="password" class="form-control string" name="SystemOptions.MongoDbOptions.Password" v-bind:value="apiMainConfigData['systemOptions']['mongoDbOptions']['password']" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-palette"></i>Display Configuration
+                <div class="card-actions">
+                    <a href="#" class="btn-minimize" data-widget="collapse"><i class="fas fa-angle-up"></i></a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped">
+                    <tr>
+                        <td width="300px">
+                            <span class="qTip" title="Display fiat currency">Display fiat currency <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                All totals are calculated in this fiat currency.
+                                <br /><br /><strong>Default:</strong> <i>USD</i>
+                            </div>
+                        </td>
+                        <td>
+                            <select id="displayfiatcurrency" name="DisplayOptions.DisplayFiatCurrency" class="select2">
+                                <option :selected="apiMainConfigData['displayOptions']['displayFiatCurrency'] == 'USD'" value="USD" data-icon="fal fa-dollar-sign">&nbsp;&nbsp;USD</option>
+                                <option :selected="apiMainConfigData['displayOptions']['displayFiatCurrency'] == 'EUR'" value="EUR" data-icon="fal fa-euro-sign">&nbsp;&nbsp;EUR</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fab fa-telegram"></i>Telegram Configuration
+                <div class="card-actions">
+                    <a href="#" class="btn-minimize" data-widget="collapse"><i class="fas fa-angle-up"></i></a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped">
+                    <tr>
+                        <td width="300px">
+                            <span class="qTip" title="Telegram ChatId">Telegram ChatId <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                <strong>Sample:</strong> 493867000
+                                <br /><br /><strong>Default:</strong> <i>none</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control string" name="TelegramOptions.TelegramChatId" v-bind:value="apiMainConfigData['telegramOptions']['telegramChatId']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Telegram Bot Token">Telegram Bot Token <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Please enter here your telegram chat id
+                                <br /><strong>Sample:</strong> 608444444:AAAA1XsvQOYO-uE3l8GX8TdyShP-lodFIyo
+                                <br /><br /><strong>Default:</strong> <i>none</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control string" name="TelegramOptions.TelegramBotToken" v-bind:value="apiMainConfigData['telegramOptions']['telegramBotToken']" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12" v-for="(exchangeValue, exchangeKey) in apiMainConfigData['exchangeOptions']">
+        <div class="card">
+            <div class="card-header">
+                <i class="fab fa-btc"></i>{{exchangeValue['exchange']}} Options
+                <div class="card-actions">
+                    <a href="#" class="btn-minimize" data-widget="collapse"><i class="fas fa-angle-up"></i></a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped">
+                    <tr>
+                        <td width="300px">
+                            <span class="qTip" title="Exchange Id">Exchange <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Please enter ExchangeId your want to use
+                                <br />0 - Binance
+                                <br /><br /><strong>Default:</strong> <i>0</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control integer" name="ExchangeOptions[].Exchange" v-bind:value="exchangeValue['exchange']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="ApiKey">ApiKey <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Please enter your Api Key
+                                <br /><br /><strong>Default:</strong> <i>none</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control string" name="ExchangeOptions[].ApiKey" v-bind:value="exchangeValue['apiKey']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="ApiSecret">ApiSecret <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Please enter your Api Secret
+                                <br /><br /><strong>Default:</strong> <i>none</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control string" name="ExchangeOptions[].ApiSecret" v-bind:value="exchangeValue['apiSecret']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="PassPhrase">PassPhrase <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Please enter your PassPhrase (if needed for your exchange)
+                                <br /><br /><strong>Default:</strong> <i>none</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control string" name="ExchangeOptions[].PassPhrase" v-bind:value="exchangeValue['passPhrase']" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fab fa-btc"></i>Trading Configuration
+                <div class="card-actions">
+                    <a href="#" class="btn-minimize" data-widget="collapse"><i class="fas fa-angle-up"></i></a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped">
+
+                    <tr>
+                        <td width="300px">
+                            <span class="qTip" title="Only sell on strategy signals">OnlySellOnStrategySignals <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Set this if you want MachinaTrading <strong>only</strong> sell if Strategy advice to sell.
+                                <br /><br /><strong>Default:</strong> <i>false</i>
+                            </div>
+                        </td>
+                        <td>
+                            <label class="switch switch-label switch-primary">
+                                <input type="checkbox" class="switch-input bool" name="TradeOptions.OnlySellOnStrategySignals" :checked="apiMainConfigData['tradeOptions']['onlySellOnStrategySignals']" />
+                                <span class="switch-slider" data-checked="✓" data-unchecked="✕"></span>
+                            </label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Buy Timer">BuyTimer <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Select interval to check for new buys
+                                <br /> You can also choose custom option to directly change cron (Quartz)
+                                <br /><br /><strong>Default:</strong> <i>0 0/5 * * * ?</i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class='row'>
+                                <div class="col-6">
+                                    <div id='buyTimerCron'></div>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" readonly class="form-control string" id="buyTimerCronInput" name="TradeOptions.BuyTimer" />
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Sell Timer">SellTimer <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Select interval to check for sell
+                                <br /> You can also choose custom option to directly change cron (Quartz)
+                                <br /><br /><strong>Default:</strong> <i>0 0/5 * * * ?</i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class='row'>
+                                <div class="col-6">
+                                    <div id='sellTimerCron'></div>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" readonly class="form-control" id="sellTimerCronInput" name="TradeOptions.SellTimer" />
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Paper Trade">PaperTrade <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Set to true to simulate trades.
+                                <br /> While PaperTrade is true no real trades will get executed
+                                <br /><br /><strong>Default:</strong> <i>true</i>
+                            </div>
+                        </td>
+                        <td>
+                            <label class="switch switch-label switch-primary">
+                                <input type="checkbox" class="switch-input bool" name="TradeOptions.PaperTrade" :checked="apiMainConfigData['tradeOptions']['paperTrade']" />
+                                <span class="switch-slider" data-checked="✓" data-unchecked="✕"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Max number of concurrent trades">MaxNumberOfConcurrentTrades <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                How many buy/sell trades should be open at same time
+                                <br /><br /><strong>Default:</strong> <i>10</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control integer" name="TradeOptions.MaxNumberOfConcurrentTrades" v-bind:value="apiMainConfigData['tradeOptions']['maxNumberOfConcurrentTrades']" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Amount to invest per trade">AmountToInvestPerTrader <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                How many base currency (usually BTC) will be used per trade
+                                <br /><br /><strong>Default:</strong> <i>0.005</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control float" name="TradeOptions.AmountToInvestPerTrader" v-bind:value="apiMainConfigData['tradeOptions']['amountToInvestPerTrader']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="ProfitStrategy">ProfitStrategy <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                ToDo
+                                <br /><br /><strong>Default:</strong> <i>0</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control integer" name="TradeOptions.ProfitStrategy" v-bind:value="apiMainConfigData['tradeOptions']['profitStrategy']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="StopLoss percentage">StopLossPercentage <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Set stop loss for trades (0.01 = 10%)
+                                <br /><br /><strong>Default:</strong> <i>-0.07</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control float" name="TradeOptions.StopLossPercentage" v-bind:value="apiMainConfigData['tradeOptions']['stopLossPercentage']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Immediately place sell order">ImmediatelyPlaceSellOrder <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Sell position immediately after successful buy with value from ImmediatelyPlaceSellOrderAtProfit
+                                <br /><br /><strong>Default:</strong> <i>false</i>
+                            </div>
+                        </td>
+                        <td>
+                            <label class="switch switch-label switch-primary">
+                                <input type="checkbox" class="switch-input bool" name="TradeOptions.ImmediatelyPlaceSellOrder" :checked="apiMainConfigData['tradeOptions']['immediatelyPlaceSellOrder']" />
+                                <span class="switch-slider" data-checked="✓" data-unchecked="✕"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Immediately place sell order with profit">ImmediatelyPlaceSellOrderAtProfit <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                If ImmediatelyPlaceSellOrder is true, sell with this percentage
+                                <br />0.02 = 2%
+                                <br /><br /><strong>Default:</strong> <i>0.02</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control float" name="TradeOptions.ImmediatelyPlaceSellOrderAtProfit" v-bind:value="apiMainConfigData['tradeOptions']['immediatelyPlaceSellOrderAtProfit']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Enable trailing stoploss">EnableTrailingStop <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                <br /><br /><strong>Default:</strong> <i>true</i>
+                            </div>
+                        </td>
+                        <td>
+                            <label class="switch switch-label switch-primary">
+                                <input type="checkbox" class="switch-input bool" name="TradeOptions.EnableTrailingStop" :checked="apiMainConfigData['tradeOptions']['enableTrailingStop']" />
+                                <span class="switch-slider" data-checked="✓" data-unchecked="✕"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Trailing stoploss starting percentage">TrailingStopStartingPercentage <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Arm Trailing stoploss at this percentage
+                                <br />0.05 = 5%
+                                <br /><br /><strong>Default:</strong> <i>0.05</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control float" name="TradeOptions.TrailingStopStartingPercentage" v-bind:value="apiMainConfigData['tradeOptions']['trailingStopStartingPercentage']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="">TrailingStopPercentage <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Sell on this percentage
+                                <br />0.05 = 5%
+                                <br /><br /><strong>Default:</strong> <i>0.05</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control float" name="TradeOptions.TrailingStopPercentage" v-bind:value="apiMainConfigData['tradeOptions']['trailingStopPercentage']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Cancel unbought orders each cycle">CancelUnboughtOrdersEachCycle <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Cancel unbought orders each cycle. Depends on time of your cron (buy/sell timer)
+                                <br /><br /><strong>Default:</strong> <i>true</i>
+                            </div>
+                        </td>
+                        <td>
+                            <label class="switch switch-label switch-primary">
+                                <input type="checkbox" class="switch-input bool" name="TradeOptions.CancelUnboughtOrdersEachCycle" :checked="apiMainConfigData['tradeOptions']['cancelUnboughtOrdersEachCycle']" />
+                                <span class="switch-slider" data-checked="✓" data-unchecked="✕"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Place first stop at SignalCandleLow">PlaceFirstStopAtSignalCandleLow <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                ToDo
+                                <br /><br /><strong>Default:</strong> <i>false</i>
+                            </div>
+                        </td>
+                        <td>
+                            <label class="switch switch-label switch-primary">
+                                <input type="checkbox" class="switch-input bool" name="TradeOptions.PlaceFirstStopAtSignalCandleLow" :checked="apiMainConfigData['tradeOptions']['placeFirstStopAtSignalCandleLow']" />
+                                <span class="switch-slider" data-checked="✓" data-unchecked="✕"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Minimum amount of volume">MinimumAmountOfVolume <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Set the minimum amount of volume to buy into a currency
+                                <br /><br /><strong>Default:</strong> <i>300</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control integer" name="TradeOptions.MinimumAmountOfVolume" v-bind:value="apiMainConfigData['tradeOptions']['minimumAmountOfVolume']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Default strategy">DefaultStrategy <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Select the strategy to use for buy/sell
+                                <br /><br /><strong>Default:</strong> <i>The Scalper</i>
+                            </div>
+                        </td>
+                        <td>
+                            <select id="tradingStrategy" name="TradeOptions.DefaultStrategy" class="select2">
+                                <option v-for="(value, key) in allStrategiesData" :selected="apiMainConfigData['tradeOptions']['defaultStrategy'] == allStrategiesData[key]['ClassName']" v-bind:value="allStrategiesData[key]['ClassName']" data-icon="fas fa-chart-line">&nbsp;&nbsp;{{allStrategiesData[key]['Name']}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="BuyInPriceStrategy">BuyInPriceStrategy <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                AskLastBalance = 0,
+                                <br />PercentageBelowBid = 1,
+                                <br />MatchCurrentBid = 2,
+                                <br />SignalCandleClose = 3
+                                <br /><br /><strong>Default:</strong> <i>3</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control integer" name="TradeOptions.BuyInPriceStrategy" v-bind:value="apiMainConfigData['tradeOptions']['buyInPriceStrategy']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Ask last balance">AskLastBalance <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                ToDo:
+                                <br /><br /><strong>Default:</strong> <i>0.2</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control float" name="TradeOptions.AskLastBalance" v-bind:value="apiMainConfigData['tradeOptions']['askLastBalance']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="BuyInPricePercentage">BuyInPricePercentage <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                ToDo:
+                                <br /><br /><strong>Default:</strong> <i>0.005</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control float" name="TradeOptions.BuyInPricePercentage" v-bind:value="apiMainConfigData['tradeOptions']['buyInPricePercentage']" />
+                        </td>
+                    </tr>
+                    <!--<tr>
+                        <td>
+                            <span class="qTip" title="">ReturnOnInvestment <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                <p></p>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control string" name="TradeOptions.ReturnOnInvestment" v-bind:value="apiMainConfigData['tradeOptions']['returnOnInvestment']" />
+                        </td>
+                    </tr>-->
+                    <tr>
+                        <td>
+                            <span class="qTip" title="QuoteCurrency">QuoteCurrency <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Enter your Base Currency
+                                <br /><br /><strong>Default:</strong> <i>BTC</i>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control string" name="TradeOptions.QuoteCurrency" v-bind:value="apiMainConfigData['tradeOptions']['quoteCurrency']" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Market blacklist">MarketBlackList <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Never trade this coins
+                                <br /> Depends on your current exchange.
+                                <br /><br /><strong>Default:</strong> <i>none</i>
+                            </div>
+                        </td>
+                        <td>
+                            <select name="TradeOptions.MarketBlackList[]" id="MarketBlackList" class="select2-multiple" data-live-search="true" data-size="10" data-width="auto" multiple="multiple">
+                                <option v-for="(value, key) in exchangeCoinsData" :selected="(apiMainConfigData['tradeOptions']['marketBlackList']).includes(value)" v-bind:value="value" data-icon="fas fa-chart-line">&nbsp;&nbsp;{{value}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="Only Trade List">OnlyTradeList <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Only trade this coins
+                                <br /> Depends on your current exchange.
+                                <br /><br /><strong>Default:</strong> <i>ETHBTC</i>
+                            </div>
+                        </td>
+                        <td>
+                            <select name="TradeOptions.OnlyTradeList[]" id="OnlyTradeList" class="select2-multiple" data-live-search="true" data-size="10" data-width="auto" multiple="multiple">
+                                <option v-for="(value, key) in exchangeCoinsData" :selected="(apiMainConfigData['tradeOptions']['onlyTradeList']).includes(value)" v-bind:value="value" data-icon="fas fa-chart-line">&nbsp;&nbsp;{{value}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="AlwaysTradeList">AlwaysTradeList <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Always trade this coins
+                                <br /> Depends on your current exchange.
+                                <br /><br /><strong>Default:</strong> <i>ETHBTC</i>
+                            </div>
+                        </td>
+                        <td>
+                            <select name="TradeOptions.AlwaysTradeList[]" id="AlwaysTradeList" class="select2-multiple" data-live-search="true" data-size="10" data-width="auto" multiple="multiple">
+                                <option v-for="(value, key) in exchangeCoinsData" :selected="(apiMainConfigData['tradeOptions']['alwaysTradeList']).includes(value)" v-bind:value="value" data-icon="fas fa-chart-line">&nbsp;&nbsp;{{value}}</option>
+                            </select>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="qTip" title="AlwaysTradeList">Add top Volume Currencies <i class="fal fa-question-circle"></i></span>
+                            <div style="display: none;">
+                                Add # of Top Colume Currencies to
+                                <br /> OnlyTradeList and AlwaysTradeList
+                                <br /><br /><strong>Default:</strong> <i>20</i>
+                                <br /><br /><strong>Warning:</strong> <i>Override your current values</i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="amountOfTopCurrenciesToAdd" placeholder="How many currencies you want to add ?">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-success" v-on:click="getTopCurrencies()">
+                                        Add # of Top Currencies
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <button type="button" class="btn btn-success btn-block" v-on:click="serializeForm();">Save</button>
+    </div>
+
+    <br />
+    <br />
+    <br />
+</div>
+
+<script type="text/javascript">
+    var initialBuyTimerCron = null;
+    var initialSellTimerCron = null;
+
+    var pagefunction = function () {
+        $(document).ready(function () {
+            var t = document.getElementById("database");
+            if (t.value === 'LiteDB') {
+                $('#databaseSettings').css("display", "none");
+            }
+        });
+        document.getElementById("database").onchange = function (e) {
+            if (this.value === 'MongoDB') {
+                $('#databaseSettings').removeAttr("style");
+            }
+            if (this.value === 'LiteDB') {
+                $('#databaseSettings').css("display", "none");
+            }
+        };
+        
+        /*$('#apiMainConfig').find(':input').each(function () {
+            $(this).on("propertychange, change, keyup, paste, input", function () {
+                event.preventDefault();
+                postFormData("apiMainConfig", "/api/config/mainConfig", false);
+            });
+            $(this).on('ifChanged', function (event) {
+                event.preventDefault();
+                postFormData("apiMainConfig", "/api/config/mainConfig", false);
+            });
+        });
+
+        $('#apiMainConfig').find(':input[type=checkbox]').each(function () {
+            $(this).change(function () {
+                event.preventDefault();
+                postFormData("apiMainConfig", "/api/config/mainConfig", false);
+            });
+        });*/
+
+        $('.qTip').on('mouseover', function (event) {
+            $(this).qtip({
+                content: {
+                    title: $(this).attr('title'),
+                    text: $(this).next('div').clone() // Use the "div" element next to this for the content
+                },
+                position: {
+                    my: 'top center',  // Position my top left...
+                    at: 'bottom center' // at the bottom right of...
+                },
+                style: {
+                    classes: 'qtip-shadow qtip-bootstrap',
+                    tip: {
+                        corner: true, // Use position.my by default
+                        //mimic: false, // Don't mimic a particular corner
+                        width: 25,
+                        height: 10,
+                        //border: true, // Detect border from tooltip style
+                        offset: 10 // Do not apply an offset from corner
+                    }
+                },
+                prerender: false,
+                overwrite: true,
+                show: {
+                    event: event.type,
+                    ready: true
+                },
+                hide: {
+                    event: 'mouseout'
+                },
+                events: {
+                    hidden: function (event, api) {
+                        $(this).qtip('destroy', true);
+                    }
+                }
+            }, event);
+        });
+
+
+        $('#buyTimerCron').cron({
+            initial: initialBuyTimerCron,
+            onChange: function () {
+                $('#buyTimerCronInput').val($(this).cron("value"));
+
+            }
+        });
+
+        $('#sellTimerCron').cron({
+            initial: initialSellTimerCron,
+            onChange: function () {
+                $('#sellTimerCronInput').val($(this).cron("value"));
+
+            }
+        });
+
+        $(".select2").select2({
+            theme: "bootstrap",
+            templateResult: selectPickerImage,
+            templateSelection: selectPickerImage,
+            width: "100%"
+        });
+
+        $('.select2-multiple').select2({
+            placeholder: 'Select Currencies',
+            //allowClear: true,
+            multiple: true,
+            tags: true,
+            theme: "bootstrap",
+            width: "100%",
+            createTag: function (item) {
+                return {
+                    id: item.term,
+                    text: item.term
+                };
+            }
+        });
+
+    };
+
+    var apiMainConfig = new Vue({
+        el: '#apiMainConfig',
+        parent: vueMain,
+
+        data: {
+            apiMainConfigData: null,
+            allStrategiesData: null,
+            exchangeCoinsData: null
+        },
+
+        created: function () {
+            this.fetchData();
+        },
+
+        methods: {
+            serializeForm: function () {
+                postFormData("apiMainConfig", "/api/config/mainConfig", true);
+            },
+            isBool: function (data) {
+                if ((typeof (data) === "boolean")) {
+                    return true;
+                }
+                return false;
+            },
+            updateSymbols: function () {
+                var self = this;
+                //Todo
+                //$.get('/api/trading/getExchangePairs?exchange=' + $("#exchangeSelect").val(), function (data) {
+                //    self.exchangeCoinsData = data;
+                //});
+            },
+            getTopCurrencies: function () {
+                var self = this;
+                $.get('/api/trading/topVolumeCurrencies?limit=' + $('#amountOfTopCurrenciesToAdd').val(), function (data) {
+                    self.apiMainConfigData['tradeOptions']['onlyTradeList'] = data;
+                    self.apiMainConfigData['tradeOptions']['alwaysTradeList'] = data;
+
+                    //Workaround to get new Items
+                    $("#OnlyTradeList").append(new Option("dummy", "dummy"));
+                    $("#OnlyTradeList").trigger("change");
+                    $("#OnlyTradeList option[value='dummy']").remove();
+
+                    $("#AlwaysTradeList").append(new Option("dummy", "dummy"));
+                    $("#AlwaysTradeList").trigger("change");
+                    $("#AlwaysTradeList option[value='dummy']").remove();
+                });
+
+            },
+            fetchData: function () {
+                var self = this;
+
+
+                $.get('/api/config/mainConfig', function (data) {
+                    self.apiMainConfigData = data;
+                    $.get('/api/backtester/backtesterStrategy', function (data) {
+                        self.allStrategiesData = data;
+                        $.get('/api/trading/exchangePairsExchangeSymbols?exchange=Binance', function (data) {
+                            self.exchangeCoinsData = data;
+                            self.$nextTick(function () {
+                                initialBuyTimerCron = self.apiMainConfigData['tradeOptions']['buyTimer'];
+                                initialSellTimerCron = self.apiMainConfigData['tradeOptions']['sellTimer'];
+                                pagefunction();
+                                //self.updateSymbols();
+                            });
+                        });
+                    });
+                });
+            }
+        }
+    });
+
+
+</script>

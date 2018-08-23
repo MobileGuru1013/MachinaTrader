@@ -1,0 +1,346 @@
+<script src="/vendors/moment/js/moment-with-locales.min.js"></script>
+<link href="/vendors/bootstrap-touchspin/css/jquery.bootstrap-touchspin.min.css" rel="stylesheet">
+<script src="/vendors/bootstrap-touchspin/js/jquery.bootstrap-touchspin.min.js"></script>
+
+<style>
+    .header-title > .col-4, .col-8 {
+        font-weight: 600;
+        letter-spacing: .04em;
+        line-height: 16px;
+        margin-bottom: 12px;
+    }
+
+    .header-title > .col-8 {
+        color: #797979;
+    }
+
+    .bootstrap-touchspin > .input-group-append {
+         padding: 0;
+         border: 0;
+     }
+</style>
+
+<div id="tradesModalEdit" v-if="trade">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-title" v-if="tradeActive"><img style="height: 32px" v-bind:src="'/img/exchange/' + trade.exchange + '.png'" /> Active Trade</h4>
+        <h4 class="modal-title" id="modal-title" v-if="!tradeActive"><img style="height: 32px" v-bind:src="'/img/exchange/' + trade.exchange + '.png'" /> Closed Trade</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span>&times;</span></button>
+    </div>
+
+    <div class="modal-body">
+        <div id="mainConfigForm">
+            <div class="row  header-title">
+                <div class="col-4 ">
+                    Trade Id:
+                </div>
+                <div class="col-8">
+                    {{trade.tradeId}}
+                </div>
+
+                <div class="col-4 ">
+                    Open Date:
+                </div>
+                <div class="col-8">
+                    {{moment(trade.openDate)}}
+                </div>
+
+                <template v-if="tradeActive">
+                    <div class="col-4">
+                        Age:
+                    </div>
+                    <div class="col-8">
+                        {{momentDiff(trade.openDate)}}
+                    </div>
+                </template>
+
+                <template v-if="!tradeActive">
+                    <div class="col-4">
+                        Sell Date:
+                    </div>
+                    <div class="col-8">
+                        {{moment(trade.closeDate)}}
+                    </div>
+                </template>
+
+                <div class="col-4">
+                    Market:
+                </div>
+                <div class="col-8">
+                    {{trade.market}}
+                </div>
+
+                <div class="col-4">
+                    Quantity:
+                </div>
+                <div class="col-8">
+                    {{trade.quantity}}
+                </div>
+
+                <div class="col-4">
+                    Cost:
+                </div>
+                <div class="col-8">
+                    {{parseFloat(trade.openRate * trade.quantity).toFixed(8)}}
+                </div>
+
+                <div class="col-4">
+                    Buy Rate:
+                </div>
+                <div class="col-8">
+                    {{trade.openRate}}
+                </div>
+
+                <template v-if="tradeActive">
+                    <div class="col-4">
+                        Current Rate:
+                    </div>
+                    <div class="col-8">
+                        <template v-if="parseFloat(((100 * trade.tickerLast.last) / trade.openRate) - 100) > 0">
+                            <span style="color: green;">
+                                {{(trade.tickerLast.last).toFixed(8)}}
+                            </span>
+                        </template>
+                        <template v-else>
+                            <span style="color: red;">
+                                {{(trade.tickerLast.last).toFixed(8)}}
+                            </span>
+                        </template>
+
+                    </div>
+                </template>
+
+                <template v-if="!tradeActive">
+                    <div class="col-4">
+                        Sell Rate:
+                    </div>
+                    <div class="col-8">
+                        <template v-if="parseFloat(((100 * trade.closeRate) / trade.openRate) - 100) > 0">
+                            <span style="color: green;">
+                                {{(trade.closeRate).toFixed(8)}}
+                            </span>
+                        </template>
+                        <template v-else>
+                            <span style="color: red;">
+                                {{(trade.closeRate).toFixed(8)}}
+                            </span>
+                        </template>
+
+                    </div>
+                </template>
+
+                <template v-if="tradeActive">
+                    <div class="col-4">
+                        Stop-Loss Rate:
+                    </div>
+                    <div class="col-8">
+                        {{trade.stopLossRate}}
+                    </div>
+                </template>
+
+                <template v-if="!tradeActive">
+                    <div class="col-4">
+                        Result:
+                    </div>
+                    <div class="col-8">
+                        <template v-if="parseFloat(((100 * trade.closeRate) / trade.openRate) - 100) > 0">
+                            <span style="color: green;">
+                                {{parseFloat(((100 * trade.closeRate) / trade.openRate) - 100).toFixed(2)}} %
+                            </span>
+                        </template>
+                        <template v-else>
+                            <span style="color: red;">
+                                {{parseFloat(((100 * trade.closeRate) / trade.openRate) - 100).toFixed(2)}} %
+                            </span>
+                        </template>
+
+                    </div>
+                </template>
+
+                <template v-if="tradeActive">
+                    <div class="col-4">
+                        Result:
+                    </div>
+                    <div class="col-8">
+                        <template v-if="parseFloat(((100 * trade.tickerLast.last) / trade.openRate) - 100) > 0">
+                            <span style="color: green;">
+                                {{parseFloat(((100 * trade.tickerLast.last) / trade.openRate) - 100).toFixed(2)}} %
+                            </span>
+                        </template>
+                        <template v-else>
+                            <span style="color: red;">
+                                {{parseFloat(((100 * trade.tickerLast.last) / trade.openRate) - 100).toFixed(2)}} %
+                            </span>
+                        </template>
+
+                    </div>
+                </template>
+
+                <div class="col-4">
+                    Strategy:
+                </div>
+                <div class="col-8">
+                    {{trade.strategyUsed}}
+                </div>
+
+                <template v-if="tradeActive">
+                    <div class="col-4">
+                        Buy OrderId:
+                    </div>
+                    <div class="col-8">
+                        {{trade.buyOrderId}}
+                    </div>
+                </template>
+                <template v-if="!tradeActive">
+                    <div class="col-4">
+                        Sell OrderId:
+                    </div>
+                    <div class="col-8">
+                        {{trade.sellOrderId}}
+                    </div>
+                </template>
+
+                <template v-if="tradeActive">
+                    <div class="col-4">
+                        Percentage Profit:
+                    </div>
+                    <div class="col-8 p-0">
+                        <div class="row m-0">
+                            <div class="col-7">
+                                <input id="percentage_profit" class="percentageProfitField form-control" type="text" v-bind:value="parseFloat(sellOnPercentage).toFixed(2)" name="percentage_profit" style="display: block;">
+                            </div>
+                            <div class="col-5">
+                                <a href="javascript:void(0)" class="btn btn-success" id="status" v-on:click="setPercentagePosition(trade.tradeId)">Save</a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-4">
+                        Target Rate:
+                    </div>
+                    <div class="col-8">
+                        {{parseFloat(trade.openRate + (trade.openRate * parseFloat(sellOnPercentage/100))).toFixed(8)}}
+                    </div>
+
+                    <div class="col-4">
+                        Hold Position:
+                    </div>
+                    <div class="col-8">
+                        <label class="switch switch-label switch-primary">
+                            <input id="hold_position" type="checkbox" class="switch-input bool" checked="" class="switch-input bool" :checked="trade.holdPosition" v-on:click="setHoldPosition(trade.tradeId)"/>
+                            <span class="switch-slider" data-checked="✓" data-unchecked="✕"></span>
+                        </label>
+                    </div>
+
+                    <div class="col-4">
+                        Sell Position:
+                    </div>
+                    <div class="col-8">
+                        <a href="javascript:void(0)" class="btn btn-danger btn-sm" style="width: 40%;" id="status" v-on:click="sellPosition(trade.tradeId)">Sell now</a>
+                    </div>
+                </template>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default margin-left" onclick="$('#tradeModal').modal('hide');">Close</button>
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+    if (typeof (tradeId) != "undefined") {
+        tradeId = tradeId;
+    }
+    else if (getParam('tradeId') != null) {
+        tradeId = getParam('tradeId');
+    } else {
+        tradeId = "7b3b883255274e609c9de77d19eb989c";
+    }
+
+    if (typeof (tradeActive) != "undefined") {
+        tradeActive = tradeActive;
+    }
+    else if (getParam('tradeActive') != null) {
+        tradeActive = getParam('tradeActive');
+    } else {
+        tradeActive = false;
+    }
+
+    var pagefunction = function () {
+        $("#percentage_profit").TouchSpin({
+            min: 0,
+            max: 100,
+            step: 0.01,
+            decimals: 2,
+            boostat: 5,
+            maxboostedstep: 10,
+            postfix: '%'
+        });
+
+        $('#percentage_profit').on('change', function () {
+            tradesModalEdit.recalculatePercentage($("#percentage_profit").val());
+        });
+    };
+
+    var tradesModalEdit = new Vue({
+        el: '#tradesModalEdit',
+        parent: vueMain,
+
+        data: {
+            trade: null,
+            sellOnPercentage: null,
+            tradeActive: tradeActive
+        },
+        created: function () {
+            this.fetchData();
+        },
+
+        methods: {
+            sellPosition(tradeId) {
+                bootbox.confirm("Sell this position now ?", function (result) {
+                    if (result === true) {
+                        $.get("/api/trading/sellNow/" + tradeId, function () {
+                        });
+                    };
+                });
+            },
+            setPercentagePosition(tradeId) {
+                $.get("/api/trading/sellOnProfit/" + tradeId + "/" + $('#percentage_profit').val(), function () {
+                });
+            },
+            setHoldPosition(tradeId) {
+                if ($('#hold_position').is(':checked')) {
+                    $.get("/api/trading/hold/" + tradeId + "/true", function () { });
+                } else {
+                    $.get("/api/trading/hold/" + tradeId + "/false", function () { });
+                }
+
+            },
+            recalculatePercentage: function (data) {
+                var self = this;
+                self.sellOnPercentage = data;
+            },
+            moment: function (data) {
+                return moment(data).format("YYYY-MM-DD HH:mm:ss");
+            },
+            momentDiff: function (buyDate) {
+                var now = moment();
+                return moment.duration(now.diff(buyDate)).humanize();
+            },
+            fetchData: function () {
+                var self = this;
+                $.get('/api/trading/trade/' + tradeId, function (data) {
+                    self.trade = data;
+                    self.sellOnPercentage = data.sellOnPercentage;
+                    self.$nextTick(function () {
+                        pagefunction();
+                    });
+                });
+            },
+        },
+    });
+</script>

@@ -1,0 +1,6 @@
+{
+	"menuTitle" : "Configuration",
+    "menuEnabled": true,
+	"menuCustomFolder":"Configuration",	
+	"menuIconClass": "fal fa-wrench"
+}

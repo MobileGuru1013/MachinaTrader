@@ -1,0 +1,75 @@
+<div class="animated fadeIn">
+
+    <div class="col-md-12" id="homeDashBoard">
+        <div class="card">
+            <div class="card-header">
+                <i class="fal fa-check"></i>MachinaTrader
+                <div class="card-actions">
+                    <a href="#" class="btn-setting"><i class="fal fa-cog"></i></a>
+                    <a href="#" class="btn-minimize" data-widget="collapse"><i class="fal fa-angle-up"></i></a>
+                    <a href="#" class="btn-close" data-widget="remove"><i class="fal fa-times-circle"></i></a>
+                </div>
+            </div>
+            <div class="card-body">
+                <strong>Loaded Plugins:</strong>
+                <br><br>
+                <template v-if="homeDashBoardData">
+                    <div v-for="(value, key, index) in homeDashBoardData">
+                        <div v-if="homeDashBoardData[key]['Enabled'] == true">
+                            {{key}}
+                        </div>
+                    </div>
+                </template>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var homeDashBoard = '/api/core/plugins';
+
+    var pagefunction = function () {
+        $(function () {
+            var element = "[class*=col]";
+            var handle = ".card-header";
+            var connect = "[class*=col]";
+            $(element).sortable({
+                handle: handle,
+                connectWith: connect,
+                tolerance: 'pointer',
+                forcePlaceholderSize: true,
+                opacity: 0.8,
+                placeholder: 'card-placeholder'
+            })
+                .disableSelection();
+        });
+
+    };
+
+    var homeDashBoard = new Vue({
+        el: '#homeDashBoard',
+        parent: vueMain,
+
+        data: {
+            homeDashBoardData: null
+        },
+
+        created: function () {
+            this.fetchData();
+        },
+
+        methods: {
+            fetchData: function () {
+                var self = this;
+                $.get(homeDashBoard, function (data) {
+                    self.homeDashBoardData = data;
+                    self.$nextTick(function () {
+                        pagefunction();
+                    });
+                });
+            }
+        }
+    });
+</script>

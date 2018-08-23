@@ -1,0 +1,93 @@
+<div id="widgetTradingViewModal">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-title"><i class="fas fa-chart-line"></i> Exchange: {{exchange}} Market: {{market}}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span>&times;</span></button>
+    </div>
+
+    <div class="modal-body">
+        <div id="mainConfigForm">
+            <div class="row" style="display: block;">
+                <div id="technical-analysis" style="display: block;min-height: 600px;height: 600px"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <div class="col-md-12" style="padding-top: 10px;">
+            <div style="text-align: center;">
+                <button type="button" class="btn btn-primary btn-block margin-right" onclick="$('#tradingViewModal').modal('hide');">Close</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+    if (typeof (exchange) != "undefined") {
+        exchange = exchange;
+    }
+    else if (getParam('exchange') != null) {
+        exchange = getParam('exchange');       
+    } else {
+        exchange = "BINANCE";
+    }
+
+    if (typeof (market) != "undefined") {
+        market = market;
+    }
+    else if (getParam('market') != null) {
+        market = getParam('market');
+    } else {
+        market = "BTCUSDT";
+    }
+
+    //fast fix for coinbase -> ToDo -> This function always return COINBASE even on valid exchanges
+    /*if (exchange.localeCompare('GDAX') || exchange.localeCompare('ExchangeGdaxSimulationApi'))
+        exchange = 'COINBASE';
+    */
+
+    market = market.replace('-', '');
+
+    new TradingView.widget({
+        "container_id": 'technical-analysis',
+        "autosize": true,
+        "symbol": exchange + ":" + market,
+        "interval": "D",
+        "timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+        "interval": "5",
+        //"timezone": "exchange",
+        "theme": "Light",
+        "style": "1",
+        "toolbar_bg": "#f1f3f6",
+        "withdateranges": true,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "save_image": false,
+        "hideideas": true,
+        "studies": ["ROC@tv-basicstudies",
+            "StochasticRSI@tv-basicstudies",
+            "MASimple@tv-basicstudies"],
+        "show_popup_button": true
+    });
+
+    var widgetTradingViewModal = new Vue({
+        el: '#widgetTradingViewModal',
+        parent: vueMain,
+
+        data: {
+            market: market,
+            exchange: exchange
+        },
+        created: function () {
+            this.fetchData();
+        },
+
+        methods: {
+            fetchData: function () {
+                var self = this;
+            }
+        }
+    });
+</script>

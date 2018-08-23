@@ -1,0 +1,7 @@
+{
+	"menuTitle" : "Logs",
+    "menuEnabled": true,
+	"menuIconClass": "fal fa-file-alt",
+	"menuCustomFolder":"Configuration",
+	"menuOrder": 1
+}

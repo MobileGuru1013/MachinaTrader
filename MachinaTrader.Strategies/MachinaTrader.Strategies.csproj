@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MachinaTrader.Globals.Structure\MachinaTrader.Globals.Structure.csproj" />
+    <ProjectReference Include="..\MachinaTrader.Globals\MachinaTrader.Globals.csproj" />
+    <ProjectReference Include="..\MachinaTrader.Indicators\MachinaTrader.Indicators.csproj" />
+  </ItemGroup>
+
+</Project>

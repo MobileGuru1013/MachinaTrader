@@ -1,0 +1,78 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<form asp-route-returnUrl="@Model.ReturnUrl" method="post">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mx-4">
+                <div class="card-body p-4">
+                    <h1>@ViewData["Title"]</h1>
+                    <p class="text-muted">Create your account</p>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <!--<div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i class="icon-user"></i>
+                        </span>
+                      </div>
+                      <input type="text" class="form-control" placeholder="Username">
+                    </div>-->
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">@@</span>
+                        </div>
+                        <input asp-for="Input.Email" placeholder="eMail" class="form-control" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="far fa-lock"></i>
+                            </span>
+                        </div>
+                        <input asp-for="Input.Password" placeholder="Password" class="form-control" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="input-group mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="far fa-lock"></i>
+                            </span>
+                        </div>
+                        <input asp-for="Input.ConfirmPassword" placeholder="Confirm Password" class="form-control" />
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-block btn-success">Create Account</button>
+                </div>
+
+                <!--<div class="card-footer p-4">
+                  <div class="row">
+                    <div class="col-6">
+                      <button class="btn btn-block btn-facebook" type="button">
+                        <span>facebook</span>
+                      </button>
+                    </div>
+                    <div class="col-6">
+                      <button class="btn btn-block btn-twitter" type="button">
+                        <span>twitter</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

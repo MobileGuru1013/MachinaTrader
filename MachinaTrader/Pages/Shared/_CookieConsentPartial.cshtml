@@ -1,0 +1,59 @@
+@using Microsoft.AspNetCore.Http.Features
+
+@{
+    var consentFeature = Context.Features.Get<ITrackingConsentFeature>();
+    var showBanner = !consentFeature?.CanTrack ?? false;
+    var cookieString = consentFeature?.CreateConsentCookie();
+}
+
+@if (showBanner)
+{
+    <style>
+        .cookiealert {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            margin: 0 !important;
+            z-index: 999;
+            opacity: 0;
+            border-radius: 0;
+            background: #212327;
+            transform: translateY(100%);
+            transition: all 500ms ease-out;
+            color: #ecf0f1;
+        }
+
+            .cookiealert.show {
+                opacity: 1;
+                transform: translateY(0%);
+                transition-delay: 1000ms;
+            }
+
+            .cookiealert a {
+                text-decoration: underline
+            }
+
+            .cookiealert .acceptcookies {
+                margin-left: 10px;
+                vertical-align: baseline;
+            }
+    </style>
+
+    <div class="alert alert-dismissible text-center cookiealert" id="cookieConsent" role="alert">
+        <div class="cookiealert-container">
+            <b>Do you like cookies?</b> &#x1F36A; We use cookies to ensure you get the best experience on our website. <a asp-controller="Home" asp-action="Privacy" class="btn btn-info btn-sm">Learn More</a>
+            <button type="button" class="btn btn-primary btn-sm" data-cookie-string="@cookieString">Accept</button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            document.querySelector("#cookieConsent").classList.add("show");
+            document.querySelector("#cookieConsent button[data-cookie-string]").addEventListener("click", function (el) {
+                document.cookie = el.target.dataset.cookieString;
+                document.querySelector("#cookieConsent").classList.remove("show");
+            }, false);
+        })();
+    </script>
+}

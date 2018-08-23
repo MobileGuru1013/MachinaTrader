@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="LazyCache.AspNetCore" Version="2.0.0-beta03" />
+    </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MachinaTrader.Exchanges\MachinaTrader.Exchanges.csproj" />
+    <ProjectReference Include="..\MachinaTrader.Globals.Structure\MachinaTrader.Globals.Structure.csproj" />
+    <ProjectReference Include="..\MachinaTrader.Globals\MachinaTrader.Globals.csproj" />
+    <ProjectReference Include="..\MachinaTrader.Strategies\MachinaTrader.Strategies.csproj" />
+  </ItemGroup>
+
+</Project>
